@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const AGENCY_CREDENTIALS = {
-  'test': 'test',
-  'myAgency': 'supersecure'
+  [process.env.NEXT_PUBLIC_AGENCY_1]: process.env.NEXT_PUBLIC_PASSWORD_1,
+  [process.env.NEXT_PUBLIC_AGENCY_2]: process.env.NEXT_PUBLIC_PASSWORD_2,
 };
 
 export default function LoginPage() {
