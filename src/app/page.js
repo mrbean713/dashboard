@@ -12,16 +12,22 @@ export default function Home() {
   const [starred, setStarred] = useState([]);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return; // 💡 SSR guard
+  
     const agency = localStorage.getItem('agency');
-    if (!agency) {
+    const token = localStorage.getItem('token');
+
+    console.log("TOKEN BEING SENT: ", token);
+  
+    if (!agency || !token) {
       router.push('/login');
       return;
     }
-
+  
     const fetchData = () => {
-      fetch("https://backend-scraper-qkcr.onrender.com/api/profiles", {
+      fetch('https://backend-scraper-qkcr.onrender.com/api/profiles', {
         headers: {
-          Authorization: "Bearer " + process.env.NEXT_PUBLIC_API_SECRET_TOKEN
+          Authorization: `Bearer ${token}`
         }
       })
         .then((res) => res.json())
