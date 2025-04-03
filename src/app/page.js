@@ -19,7 +19,11 @@ export default function Home() {
     }
 
     const fetchData = () => {
-      fetch("http://localhost:5050/api/profiles")
+      fetch("http://localhost:5050/api/profiles", {
+        headers: {
+          Authorization: "Bearer " + process.env.NEXT_PUBLIC_API_SECRET_TOKEN
+        }
+      })
         .then((res) => res.json())
         .then((data) => {
           if (Array.isArray(data)) setProfiles(data);

@@ -3,23 +3,30 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-const AGENCY_CREDENTIALS = {
-  [process.env.NEXT_PUBLIC_AGENCY_1]: process.env.NEXT_PUBLIC_PASSWORD_1,
-  [process.env.NEXT_PUBLIC_AGENCY_2]: process.env.NEXT_PUBLIC_PASSWORD_2,
-};
-
 export default function LoginPage() {
   const router = useRouter();
   const [agency, setAgency] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = () => {
-    if (AGENCY_CREDENTIALS[agency] === password) {
-      localStorage.setItem('agency', agency); // simple session
-      router.push('/');
-    } else {
-      setError('Invalid credentials');
+  const handleLogin = async () => {
+    try {
+      const res = await fetch('https://your-backend.com/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agency, password })
+      });
+
+      if (res.ok) {
+        localStorage.setItem('agency', agency);
+        router.push('/');
+      } else {
+        const data = await res.json();
+        setError(data.error || 'Invalid credentials');
+      }
+    } catch (err) {
+      setError('Network error');
+      console.error(err);
     }
   };
 
