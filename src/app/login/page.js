@@ -11,7 +11,7 @@ export default function LoginPage() {
 
   const handleLogin = async () => {
     try {
-      const res = await fetch('https://your-backend.com/api/login', {
+      const res = await fetch('https://backend-scraper-qkcr.onrender.com/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ agency, password })
@@ -19,6 +19,7 @@ export default function LoginPage() {
 
       if (res.ok) {
         localStorage.setItem('agency', agency);
+        localStorage.setItem('token', "BnBFVMYHto5dtnROiT625BMHcy81vHUC"); // 🔥 store token
         router.push('/');
       } else {
         const data = await res.json();
