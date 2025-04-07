@@ -10,20 +10,27 @@ export default function Home() {
   const [platform, setPlatform] = useState('Instagram');
   const [isLoading, setIsLoading] = useState(true);
   const [starred, setStarred] = useState([]);
+  const [sortOrder, setSortOrder] = useState('desc');
+
+  const parseFollowers = (str) => {
+    if (!str || typeof str !== 'string') return 0;
+    const clean = str.toLowerCase().replace(/[^0-9.km]/g, '');
+    if (clean.endsWith('k')) return parseFloat(clean) * 1_000;
+    if (clean.endsWith('m')) return parseFloat(clean) * 1_000_000;
+    return parseInt(clean.replace(/,/g, '')) || 0;
+  };
 
   useEffect(() => {
-    if (typeof window === 'undefined') return; // 💡 SSR guard
-  
+    if (typeof window === 'undefined') return;
+
     const agency = localStorage.getItem('agency');
     const token = localStorage.getItem('token');
 
-    console.log("TOKEN BEING SENT: ", token);
-  
     if (!agency || !token) {
       router.push('/login');
       return;
     }
-  
+
     const fetchData = () => {
       fetch('https://backend-scraper-qkcr.onrender.com/api/profiles', {
         headers: {
@@ -60,9 +67,15 @@ export default function Home() {
     localStorage.setItem('starredProfiles', JSON.stringify(updated));
   };
 
-  const displayed = profiles.filter((p) =>
-    platform === 'Starred' ? starred.includes(p.profile_url) : p.platform === platform
-  );
+  const displayed = profiles
+    .filter((p) =>
+      platform === 'Starred' ? starred.includes(p.profile_url) : p.platform === platform
+    )
+    .sort((a, b) => {
+      const aCount = parseFollowers(a.followers);
+      const bCount = parseFollowers(b.followers);
+      return sortOrder === 'asc' ? aCount - bCount : bCount - aCount;
+    });
 
   if (isLoading) {
     return <div className="text-center p-10 text-white">Loading dashboard...</div>;
@@ -94,7 +107,18 @@ export default function Home() {
     <div className="p-6">
       <h1 className="text-3xl font-bold mb-6 text-center">OF Recruitement Dashboard</h1>
 
-      <div className="flex justify-center gap-4 mb-8">
+      <div className="flex justify-center gap-4 mb-8 flex-wrap">
+        <div className="mt-1">
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            className="bg-zinc-800 text-white border border-zinc-700 px-4 py-2 rounded"
+          >
+            <option value="desc">Sort: Followers ↓</option>
+            <option value="asc">Sort: Followers ↑</option>
+          </select>
+        </div>
+
         <button className={buttonStyles('Instagram')} onClick={() => setPlatform('Instagram')}>
           <Instagram size={18} /> Instagram
         </button>
